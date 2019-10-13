@@ -1,12 +1,5 @@
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import entity.Cliente;
-import factory.ConnectionFactory;
-
 public class Main {
 	public static void main(String[] args) {
-		Connection connection = ConnectionFactory.getConnection();
 		try {
 			Inicial inicial = new Inicial();
 			inicial.setVisible(true);

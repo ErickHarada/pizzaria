@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Cliente {
 
@@ -15,6 +16,13 @@ public class Cliente {
 
 	public Cliente(int id_cliente, String nome, String telefone, String cep, String endereco) {
 		this.id_cliente = id_cliente;
+		this.nome = nome;
+		this.telefone = telefone;
+		this.cep = cep;
+		this.endereco = endereco;
+	}
+
+	public Cliente(String nome, String telefone, String cep, String endereco) {
 		this.nome = nome;
 		this.telefone = telefone;
 		this.cep = cep;
@@ -82,32 +90,34 @@ public class Cliente {
 
 	}
 
-	public void carregar(Connection connection) {
-		String sql = "SELECT nome, telefone, cep, endereco FROM cliente WHERE id_cliente=?";
+	public ArrayList<Cliente> carregarCliente(Connection connection, String verifica) {
+		String sql = "SELECT nome, telefone, cep, endereco FROM cliente WHERE telefone=?";
+		ArrayList<Cliente> lista = new ArrayList<Cliente>();
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
-			pst.setInt(1, id_cliente);
+			pst.setString(1, verifica);
 			ResultSet rs = pst.executeQuery();
-			if (rs.next()) {
-				nome = rs.getString("nome");
-				telefone = rs.getString("telefone");
-				cep = rs.getString("cep");
-				endereco = rs.getString("endereco");
+			while (rs.next()) {
+				Cliente cliente = new Cliente(rs.getString("nome"), rs.getString("telefone"), rs.getString("cep"),
+						rs.getString("endereco"));
+				lista.add(cliente);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		return lista;
 	}
 
-	public void atualizar(Connection connection) {
-		String sql = "update cliente set nome=?, telefone=?, cep=?, endereco=? where id_cliente=?";
+	public void atualizarCliente(Connection connection, String tel) {
+		String sql = "update cliente set nome=?, telefone=?, cep=?, endereco=? where telefone=?";
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
 
 			pst.setString(1, nome);
 			pst.setString(2, telefone);
 			pst.setString(3, cep);
 			pst.setString(4, endereco);
-			pst.setInt(5, id_cliente);
+			pst.setString(5, tel);
 
 			pst.execute();
 
