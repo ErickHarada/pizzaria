@@ -1,29 +1,42 @@
 package entity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 public class Produto {
-	
+
 	private int id_produto;
 	private String nome;
 	private int quantidade_produto;
 	private double preco;
-	
+
 	public Produto(int id_produto, String nome, int quantidade_produto, double preco) {
 		this.id_produto = id_produto;
 		this.nome = nome;
 		this.quantidade_produto = quantidade_produto;
 		this.preco = preco;
 	}
-	
-	public Produto() {}
-	
+
+	public Produto(String nome, int quantidade_produto, double preco) {
+		this.nome = nome;
+		this.quantidade_produto = quantidade_produto;
+		this.preco = preco;
+	}
+
+	public Produto() {
+	}
+
 	public int getId_produto() {
 		return id_produto;
 	}
-	
+
 	public void setId_produto(int id_produto) {
 		this.id_produto = id_produto;
 	}
-	
+
 	public String getNome() {
 		return nome;
 	}
@@ -47,9 +60,27 @@ public class Produto {
 	public void setPreco(double preco) {
 		this.preco = preco;
 	}
-	
+
 	public String toString() {
 		return String.format("Produto=[nome=%s, quantidade_produto=%d, preco=%f]", nome, quantidade_produto, preco);
+	}
+
+	public ArrayList<Produto> carregarProduto(Connection connection) {
+		String sql = "select nome, quantidade_produto, preco from produto";
+		ArrayList<Produto> lista = new ArrayList<Produto>();
+		try (PreparedStatement pst = connection.prepareStatement(sql)) {
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				Produto produto = new Produto(rs.getString("nome"), rs.getInt("quantidade_produto"),
+						rs.getDouble("preco"));
+				lista.add(produto);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return lista;
 	}
 
 }

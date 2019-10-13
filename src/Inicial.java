@@ -4,6 +4,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import TableModels.Tabela;
 import entity.Cliente;
 import factory.ConnectionFactory;
 
@@ -81,8 +82,10 @@ public class Inicial extends JFrame {
 					connection.close();
 					if (lista.size() > 1) {
 						btnEditar.setEnabled(true);
+						btnNewButton.setEnabled(true);
 					} else {
 						btnEditar.setEnabled(false);
+						btnNewButton.setEnabled(false);
 					}
 
 				} catch (SQLException s) {
@@ -107,6 +110,15 @@ public class Inicial extends JFrame {
 		inicialPane.add(btnEditar);
 		
 		btnNewButton = new JButton("Pedir");
+		btnNewButton.setEnabled(false);
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				Pedido pedido = new Pedido();
+				pedido.setVisible(true);
+				pedido.setLocationRelativeTo(null); // centraliza a janela
+			}
+		});
 		btnNewButton.setFont(new Font("Arial", Font.BOLD, 20));
 		btnNewButton.setBounds(479, 289, 147, 73);
 		inicialPane.add(btnNewButton);

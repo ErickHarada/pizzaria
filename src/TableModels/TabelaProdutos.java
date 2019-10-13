@@ -1,14 +1,16 @@
+package TableModels;
+
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import entity.Cliente;
+import entity.Produto;
 
-public class Tabela extends AbstractTableModel {
-	String[] colunaNome = { "nome", "telefone", "cep", "endereço"};
-	private ArrayList<Cliente> lista;
+public class TabelaProdutos extends AbstractTableModel {
+	String[] colunaNome = { "Sabor", "Quantidade restante", "Preço"};
+	private ArrayList<Produto> lista;
 	
-	public Tabela(ArrayList<Cliente> lista) {
+	public TabelaProdutos(ArrayList<Produto> lista) {
 		this.lista = lista;
 	}
 
@@ -25,16 +27,14 @@ public class Tabela extends AbstractTableModel {
     }
 
 	public Object getValueAt(int linha, int coluna) {
-		Cliente cliente = lista.get(linha);
+		Produto produto = lista.get(linha);
 		switch (coluna) {
 		case 0:
-			return cliente.getNome();
+			return produto.getNome();
 		case 1:
-			return cliente.getTelefone();
+			return produto.getQuantidade_produto();
 		case 2:
-			return cliente.getCep();
-		case 3:
-			return cliente.getEndereco();
+			return String.format("%.2f", produto.getPreco());
 		}
 		return "";
 	}
