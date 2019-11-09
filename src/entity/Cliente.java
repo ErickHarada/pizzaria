@@ -126,15 +126,16 @@ public class Cliente {
 		}
 	}
 
-	public void delete(Connection connection) {
-		String sql = "delete from cliente where id_cliente=?";
+	public void deletarCliente(Connection connection, String tel) {
+		String sql = "delete from cliente where telefone=?";
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
-
-			pst.setInt(1, id_cliente);
+			
+			pst.setString(1, tel);
 			pst.execute();
-
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 }

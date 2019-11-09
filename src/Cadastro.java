@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -20,14 +21,14 @@ import java.awt.event.ActionEvent;
 public class Cadastro extends JFrame {
 
 	private JPanel cadastroPane;
-	private JTextField textNome; 
+	private JTextField textNome;
 	private JTextField textTelefone;
 	private JTextField textCep;
 	private JTextField textEndereco;
 	private JButton btnCadastrar;
 	private JButton btnCancelar;
 
-	public Cadastro() {
+	public Cadastro(ArrayList<Cliente> lista) {
 		setTitle("Cadastro");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 656, 496);
@@ -76,6 +77,13 @@ public class Cadastro extends JFrame {
 		cadastroPane.add(textEndereco);
 		textEndereco.setColumns(10);
 
+		if (lista != null) {
+			textNome.setText(lista.get(0).getNome());
+			textTelefone.setText(lista.get(0).getTelefone());
+			textCep.setText(lista.get(0).getCep());
+			textEndereco.setText(lista.get(0).getEndereco());
+		}
+
 		btnCadastrar = new JButton("Cadastrar");
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -83,28 +91,51 @@ public class Cadastro extends JFrame {
 				String telefone = textTelefone.getText();
 				String cep = textCep.getText();
 				String endereco = textEndereco.getText();
-				if(textNome.getText().trim().isEmpty() || textTelefone.getText().trim().isEmpty()
-				|| textCep.getText().trim().isEmpty() || textEndereco.getText().trim().isEmpty()) { //valida os campos
+				if (textNome.getText().trim().isEmpty() || textTelefone.getText().trim().isEmpty()
+						|| textCep.getText().trim().isEmpty() || textEndereco.getText().trim().isEmpty()) { // valida os
+																											// campos
 					JOptionPane.showMessageDialog(null, "Os campos não podem estar vazio");
-				}else {
-					try {
-						Connection connection = ConnectionFactory.getConnection();
-						connection.setAutoCommit(false);
-						Cliente cliente = new Cliente();
-						cliente.setNome(nome);
-						cliente.setTelefone(telefone);
-						cliente.setCep(cep);
-						cliente.setEndereco(endereco);
-						cliente.inserirCliente(connection);
-						connection.commit();
-						connection.close();
-						dispose();
-						Inicial inicial = new Inicial();
-						inicial.setVisible(true);
-						inicial.setLocationRelativeTo(null); // centraliza a janela
+				} else {
+					if (lista != null) {
+						try {
+							Connection connection = ConnectionFactory.getConnection();
+							connection.setAutoCommit(false);
+							Cliente cliente = new Cliente();
+							cliente.setNome(nome);
+							cliente.setTelefone(telefone);
+							cliente.setCep(cep);
+							cliente.setEndereco(endereco);
+							cliente.atualizarCliente(connection, lista.get(0).getTelefone());
+							connection.commit();
+							connection.close();
+							dispose();
+							Inicial inicial = new Inicial();
+							inicial.setVisible(true);
+							inicial.setLocationRelativeTo(null); // centraliza a janela
 
-					} catch (SQLException e) {
-						e.printStackTrace();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					} else {
+						try {
+							Connection connection = ConnectionFactory.getConnection();
+							connection.setAutoCommit(false);
+							Cliente cliente = new Cliente();
+							cliente.setNome(nome);
+							cliente.setTelefone(telefone);
+							cliente.setCep(cep);
+							cliente.setEndereco(endereco);
+							cliente.inserirCliente(connection);
+							connection.commit();
+							connection.close();
+							dispose();
+							Inicial inicial = new Inicial();
+							inicial.setVisible(true);
+							inicial.setLocationRelativeTo(null); // centraliza a janela
+
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 

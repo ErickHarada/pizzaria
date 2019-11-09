@@ -23,7 +23,7 @@ public class Pedido extends JFrame {
 	private JTextField textCliente;
 	private JTextField textTelefone;
 
-	public Pedido() {
+	public Pedido(String nome, String tel) {
 		setTitle("Pedido");
 		setLocationRelativeTo(null); // centraliza a janela
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,10 +49,9 @@ public class Pedido extends JFrame {
 		lblCliente.setBounds(27, 32, 56, 16);
 		contentPane.add(lblCliente);
 
-		textCliente = new JTextField();
+		textCliente = new JTextField(nome);
 		textCliente.setFont(new Font("Arial", Font.BOLD, 15));
 		textCliente.setBounds(95, 25, 173, 30);
-		textCliente.setText("Cliente");
 		textCliente.setEditable(false);
 		contentPane.add(textCliente);
 
@@ -61,10 +60,9 @@ public class Pedido extends JFrame {
 		lblTelefone.setBounds(12, 74, 71, 16);
 		contentPane.add(lblTelefone);
 
-		textTelefone = new JTextField();
+		textTelefone = new JTextField(tel);
 		textTelefone.setFont(new Font("Arial", Font.BOLD, 15));
 		textTelefone.setBounds(95, 67, 173, 30);
-		textTelefone.setText("99508657");
 		textTelefone.setEditable(false);
 		contentPane.add(textTelefone);
 	}

@@ -13,9 +13,9 @@ public class ConnectionFactory{
             // Configurando a nossa conexão com um banco de dados//
             String serverName = "localhost:3306";    //caminho do servidor do BD
             String mydatabase = "pizzaria";        //nome do banco de dados
-            String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
+            String url = "jdbc:mysql://" + serverName + "/" + mydatabase + "?useTimezone=true&serverTimezone=UTC";
             String username = "root";        //nome de um usuário
-            String password = "";      //senha
+            String password = "root";      //senha
             Connection connection = DriverManager.getConnection(url, username, password);
             System.out.println("funcionando");
             return connection;
@@ -24,6 +24,7 @@ public class ConnectionFactory{
             return null;
         } catch (SQLException e) {
             System.out.println("Nao foi possivel conectar ao Banco de Dados.");
+            System.out.println(e.getMessage());
             return null;
         }
     }
