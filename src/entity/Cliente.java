@@ -91,13 +91,13 @@ public class Cliente {
 	}
 
 	public ArrayList<Cliente> carregarCliente(Connection connection, String verifica) {
-		String sql = "SELECT nome, telefone, cep, endereco FROM cliente WHERE telefone=?";
+		String sql = "SELECT id_cliente, nome, telefone, cep, endereco FROM cliente WHERE telefone=?";
 		ArrayList<Cliente> lista = new ArrayList<Cliente>();
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
 			pst.setString(1, verifica);
 			ResultSet rs = pst.executeQuery();
 			while (rs.next()) {
-				Cliente cliente = new Cliente(rs.getString("nome"), rs.getString("telefone"), rs.getString("cep"),
+				Cliente cliente = new Cliente(rs.getInt("id_cliente"), rs.getString("nome"), rs.getString("telefone"), rs.getString("cep"),
 						rs.getString("endereco"));
 				lista.add(cliente);
 			}

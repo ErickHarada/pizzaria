@@ -66,12 +66,12 @@ public class Produto {
 	}
 
 	public ArrayList<Produto> carregarProduto(Connection connection) {
-		String sql = "select nome, quantidade_produto, preco from produto";
+		String sql = "select id_produto, nome, quantidade_produto, preco from produto";
 		ArrayList<Produto> lista = new ArrayList<Produto>();
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
 			ResultSet rs = pst.executeQuery();
 			while (rs.next()) {
-				Produto produto = new Produto(rs.getString("nome"), rs.getInt("quantidade_produto"),
+				Produto produto = new Produto(rs.getInt("id_produto"), rs.getString("nome"), rs.getInt("quantidade_produto"),
 						rs.getDouble("preco"));
 				lista.add(produto);
 			}

@@ -127,9 +127,9 @@ public class Inicial extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 				Cliente cliente = lista.get(0);
-				Pedido pedido = new Pedido(cliente.getNome(), cliente.getTelefone());
-				pedido.setVisible(true);
-				pedido.setLocationRelativeTo(null); // centraliza a janela
+				Pedir pedir = new Pedir(cliente.getId_cliente(), cliente.getNome(), cliente.getTelefone());
+				pedir.setVisible(true);
+				pedir.setLocationRelativeTo(null); // centraliza a janela
 			}
 		});
 		btnPedir.setFont(new Font("Arial", Font.BOLD, 20));

@@ -1,6 +1,9 @@
 package entity;
 
-import java.util.Date;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Date;
 
 public class Pedido {
 
@@ -9,13 +12,17 @@ public class Pedido {
 	private double preco_total;
 	private Date data_pedido;
 	private boolean borda_pizza;
+	private int fk_cliente_id_cliente;
+	private int fk_produto_id_produto;
 
-	public Pedido(int id_pedido, int quantidade_produto, double preco_total, Date data_pedido, boolean borda_pizza) {
-		this.id_pedido = id_pedido;
+	public Pedido(int quantidade_produto, double preco_total, Date data_pedido, boolean borda_pizza,
+			int fk_cliente_id_cliente, int fk_produto_id_produto) {
 		this.quantidade_produto = quantidade_produto;
 		this.preco_total = preco_total;
 		this.data_pedido = data_pedido;
 		this.borda_pizza = borda_pizza;
+		this.fk_cliente_id_cliente = fk_cliente_id_cliente;
+		this.fk_produto_id_produto = fk_produto_id_produto;
 	}
 
 	public Pedido() {
@@ -59,5 +66,36 @@ public class Pedido {
 
 	public void setBorda_pizza(boolean borda_pizza) {
 		this.borda_pizza = borda_pizza;
+	}
+	public int getFk_cliente_id_cliente() {
+		return fk_cliente_id_cliente;
+	}
+
+	public void setFk_cliente_id_cliente(int fk_cliente_id_cliente) {
+		this.fk_cliente_id_cliente = fk_cliente_id_cliente;
+	}
+
+	public int getFk_produto_id_produto() {
+		return fk_produto_id_produto;
+	}
+
+	public void setFk_produto_id_produto(int fk_produto_id_produto) {
+		this.fk_produto_id_produto = fk_produto_id_produto;
+	}
+	
+	public void inserirPedido(Connection connection) {
+		String sql = "INSERT INTO pedido (fk_cliente_id_cliente, fk_produto_id_produto, quantidade_produto, borda_pizza, preco_total, data_pedido) VALUES(?,?,?,?,?,?)";
+		try (PreparedStatement pst = connection.prepareStatement(sql)) {
+			pst.setInt(1, fk_cliente_id_cliente);
+			pst.setInt(2, fk_produto_id_produto);
+			pst.setInt(3, quantidade_produto);
+			pst.setBoolean(4, borda_pizza);
+			pst.setDouble(5, preco_total);
+			pst.setDate(6,data_pedido);
+			pst.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 }
