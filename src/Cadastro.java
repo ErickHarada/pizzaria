@@ -109,7 +109,7 @@ public class Cadastro extends JFrame {
 							connection.commit();
 							connection.close();
 							dispose();
-							Inicial inicial = new Inicial();
+							Inicial inicial = new Inicial(null);
 							inicial.setVisible(true);
 							inicial.setLocationRelativeTo(null); // centraliza a janela
 
@@ -129,7 +129,7 @@ public class Cadastro extends JFrame {
 							connection.commit();
 							connection.close();
 							dispose();
-							Inicial inicial = new Inicial();
+							Inicial inicial = new Inicial(null);
 							inicial.setVisible(true);
 							inicial.setLocationRelativeTo(null); // centraliza a janela
 
@@ -141,19 +141,19 @@ public class Cadastro extends JFrame {
 
 			}
 		});
-		btnCadastrar.setBounds(189, 350, 97, 30);
+		btnCadastrar.setBounds(330, 350, 97, 30);
 		cadastroPane.add(btnCadastrar);
 
 		btnCancelar = new JButton("Cancelar");
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
-				Inicial inicial = new Inicial();
+				Inicial inicial = new Inicial(null);
 				inicial.setVisible(true);
 				inicial.setLocationRelativeTo(null); // centraliza a janela
 			}
 		});
-		btnCancelar.setBounds(328, 350, 97, 30);
+		btnCancelar.setBounds(189, 350, 97, 30);
 		cadastroPane.add(btnCancelar);
 
 	}

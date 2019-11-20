@@ -71,8 +71,8 @@ public class Produto {
 		try (PreparedStatement pst = connection.prepareStatement(sql)) {
 			ResultSet rs = pst.executeQuery();
 			while (rs.next()) {
-				Produto produto = new Produto(rs.getInt("id_produto"), rs.getString("nome"), rs.getInt("quantidade_produto"),
-						rs.getDouble("preco"));
+				Produto produto = new Produto(rs.getInt("id_produto"), rs.getString("nome"),
+						rs.getInt("quantidade_produto"), rs.getDouble("preco"));
 				lista.add(produto);
 			}
 
@@ -81,6 +81,21 @@ public class Produto {
 		}
 
 		return lista;
+	}
+
+	public Produto carregarProdutoEscolhidos(Connection connection, int verifica) {
+		String sql = "select nome from produto where id_produto=?";
+		Produto produto = new Produto();
+		try (PreparedStatement pst = connection.prepareStatement(sql)) {
+			pst.setInt(1, verifica);
+			ResultSet rs = pst.executeQuery();
+			if (rs.next()) {
+				produto.setNome(rs.getString("nome"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return produto;
 	}
 
 }

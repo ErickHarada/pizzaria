@@ -2,7 +2,9 @@ package entity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.sql.Date;
 
 public class Pedido {
@@ -15,6 +17,17 @@ public class Pedido {
 	private int fk_cliente_id_cliente;
 	private int fk_produto_id_produto;
 
+	public Pedido(int id_pedido, int quantidade_produto, double preco_total, Date data_pedido, boolean borda_pizza,
+			int fk_cliente_id_cliente, int fk_produto_id_produto) {
+		this.id_pedido = id_pedido;
+		this.quantidade_produto = quantidade_produto;
+		this.preco_total = preco_total;
+		this.data_pedido = data_pedido;
+		this.borda_pizza = borda_pizza;
+		this.fk_cliente_id_cliente = fk_cliente_id_cliente;
+		this.fk_produto_id_produto = fk_produto_id_produto;
+	}
+	
 	public Pedido(int quantidade_produto, double preco_total, Date data_pedido, boolean borda_pizza,
 			int fk_cliente_id_cliente, int fk_produto_id_produto) {
 		this.quantidade_produto = quantidade_produto;
@@ -97,5 +110,32 @@ public class Pedido {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public ArrayList<Pedido> carregarPedido(Connection connection, int verifica) {
+		String sql = "SELECT id_pedido, fk_cliente_id_cliente, fk_produto_id_produto, quantidade_produto, borda_pizza, preco_total, data_pedido FROM pedido WHERE fk_cliente_id_cliente=?";
+		ArrayList<Pedido> lista = new ArrayList<Pedido>();
+		try (PreparedStatement pst = connection.prepareStatement(sql)) {
+			pst.setInt(1, verifica);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				Pedido pedido = new Pedido(rs.getInt("id_pedido"), rs.getInt("quantidade_produto"), rs.getDouble("preco_total"), rs.getDate("data_pedido"), rs.getBoolean("borda_pizza"), 
+						rs.getInt("fk_cliente_id_cliente"), rs.getInt("fk_produto_id_produto"));
+				lista.add(pedido);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lista;
+	}
+	
+	public void deletarCliente(Connection connection, int num) {
+		String sql = "delete from pedido where id_pedido=?";
+		try (PreparedStatement pst = connection.prepareStatement(sql)) {			
+			pst.setInt(1, num);
+			pst.execute();			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -1,7 +1,7 @@
 public class Main {
 	public static void main(String[] args) {
 		try {
-			Inicial inicial = new Inicial();
+			Inicial inicial = new Inicial(null);
 			inicial.setVisible(true);
 			inicial.setLocationRelativeTo(null); //centraliza a janela
 			
