@@ -40,7 +40,7 @@ public class TabelaPedido extends AbstractTableModel {
 		Produto sabor = produto.get(linha);
 		switch (coluna) {
 		case 0:
-			return pedir.getId_pedido();
+			return pedir.getFk_pedido_id_pedido();
 		case 1:
 			return cliente.getNome();
 		case 2:
@@ -54,7 +54,11 @@ public class TabelaPedido extends AbstractTableModel {
 		case 6:
 			return pedir.getQuantidade_produto();
 		case 7:
-			return pedir.isBorda_pizza();
+			if(pedir.isBorda_pizza()) {
+				return "Com borda";
+			}else {
+				return "Sem borda";
+			}
 		case 8:
 			return pedir.getPreco_total();
 		case 9:

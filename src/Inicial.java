@@ -40,6 +40,7 @@ public class Inicial extends JFrame {
 	private JTextField textNumeroPedido;
 	private JLabel lblNmeroDoPedido;
 	private JButton btnDeletarPedido;
+	private JButton btnEditarPedido;
 
 	public Inicial(String num) {
 		setTitle("Pizzaria");
@@ -104,10 +105,13 @@ public class Inicial extends JFrame {
 						Pedido pedidoRealizado = new Pedido();
 						pedido = pedidoRealizado.carregarPedido(connection, lista.get(0).getId_cliente());
 						if (pedido.size() < 1) {
-							JOptionPane.showMessageDialog(null, "Cliente já cadastrado");
+							JOptionPane.showMessageDialog(null, "Cliente já cadastrado\n"+ "Nome: "+ lista.get(0).getNome() + 
+									"\nTelefone: " + lista.get(0).getTelefone() + "\nEndereço: " + lista.get(0).getEndereco() + "\nCEP: " + lista.get(0).getCep());
 							return;
+						}else {
+							btnDeletarPedido.setEnabled(true);
+							btnEditarPedido.setEnabled(true);
 						}
-						btnDeletarPedido.setEnabled(true);
 						for (int i = 0; i < pedido.size(); i++) {
 							Produto sabor = new Produto();
 							produto.add(sabor.carregarProdutoEscolhidos(connection,
@@ -162,7 +166,7 @@ public class Inicial extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 				Cliente cliente = lista.get(0);
-				Pedir pedir = new Pedir(cliente.getId_cliente(), cliente.getNome(), cliente.getTelefone());
+				Pedir pedir = new Pedir(cliente.getId_cliente(), cliente.getNome(), cliente.getTelefone(), 0);
 				pedir.setVisible(true);
 				pedir.setLocationRelativeTo(null); // centraliza a janela
 			}
@@ -198,12 +202,12 @@ public class Inicial extends JFrame {
 		
 		lblNmeroDoPedido = new JLabel("N\u00FAmero do Pedido");
 		lblNmeroDoPedido.setFont(new Font("Arial", Font.BOLD, 15));
-		lblNmeroDoPedido.setBounds(377, 219, 137, 16);
+		lblNmeroDoPedido.setBounds(257, 219, 137, 16);
 		inicialPane.add(lblNmeroDoPedido);
 		
 		textNumeroPedido = new JTextField();
 		textNumeroPedido.setFont(new Font("Arial", Font.PLAIN, 15));
-		textNumeroPedido.setBounds(526, 216, 79, 22);
+		textNumeroPedido.setBounds(401, 216, 79, 22);
 		inicialPane.add(textNumeroPedido);
 		textNumeroPedido.setColumns(10);
 		
@@ -215,7 +219,7 @@ public class Inicial extends JFrame {
 					Connection connection = ConnectionFactory.getConnection();
 					connection.setAutoCommit(false);
 					Pedido pedido = new Pedido();
-					pedido.deletarCliente(connection, Integer.parseInt(textNumeroPedido.getText()));
+					pedido.deletarPedido(connection, Integer.parseInt(textNumeroPedido.getText()));
 					connection.commit();
 					connection.close();
 					JOptionPane.showMessageDialog(null, "Pedido deletado");
@@ -231,6 +235,20 @@ public class Inicial extends JFrame {
 		btnDeletarPedido.setFont(new Font("Arial", Font.PLAIN, 13));
 		btnDeletarPedido.setBounds(617, 212, 159, 30);
 		inicialPane.add(btnDeletarPedido);
+		
+		btnEditarPedido = new JButton("Editar Pedido");
+		btnEditarPedido.setEnabled(false);
+		btnEditarPedido.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dispose();
+				Cliente cliente = lista.get(0);
+				Pedir pedir = new Pedir(cliente.getId_cliente(), cliente.getNome(), cliente.getTelefone(), Integer.parseInt(textNumeroPedido.getText()));
+				pedir.setVisible(true);
+				pedir.setLocationRelativeTo(null); // centraliza a janela
+			}
+		});
+		btnEditarPedido.setBounds(490, 212, 121, 30);
+		inicialPane.add(btnEditarPedido);
 		
 	}
 }

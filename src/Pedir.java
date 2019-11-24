@@ -40,11 +40,12 @@ public class Pedir extends JFrame {
 	private JTextField textTelefone;
 	private JComboBox<String> comboBox;
 	ArrayList<Produto> estoque;
+	ArrayList<Pedido> editarPedido;
 	private JTextField textQuantidade;
 	private JButton btnCancelar;
 	private JButton btnFinalizar;
 
-	public Pedir(int id, String nome, String tel) {
+	public Pedir(int id, String nome, String tel, int numeroPedido) {
 		setTitle("Pedido");
 		setLocationRelativeTo(null); // centraliza a janela
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -89,35 +90,7 @@ public class Pedir extends JFrame {
 		textTelefone.setEditable(false);
 		contentPane.add(textTelefone);
 
-		/*
-		 * comboBox = new JComboBox<String>(); comboBox.setFont(new Font("Arial",
-		 * Font.PLAIN, 15)); comboBox.setBounds(91, 179, 160, 22);
-		 * contentPane.add(comboBox); comboBox.insertItemAt("", 0); carregaLista();
-		 * 
-		 * JLabel lblSabor = new JLabel("Sabor");
-		 * lblSabor.setHorizontalAlignment(SwingConstants.RIGHT); lblSabor.setFont(new
-		 * Font("Arial", Font.BOLD, 15)); lblSabor.setBounds(23, 182, 56, 16);
-		 * contentPane.add(lblSabor);
-		 * 
-		 * JLabel lblQuantidade = new JLabel("Quantidade"); lblQuantidade.setFont(new
-		 * Font("Arial", Font.BOLD, 15));
-		 * lblQuantidade.setHorizontalAlignment(SwingConstants.RIGHT);
-		 * lblQuantidade.setBounds(263, 182, 82, 16); contentPane.add(lblQuantidade);
-		 * 
-		 * textQuantidade = new JTextField(); textQuantidade.setFont(new Font("Arial",
-		 * Font.PLAIN, 15)); textQuantidade.setBounds(354, 179, 61, 22);
-		 * contentPane.add(textQuantidade); textQuantidade.setColumns(10);
-		 * 
-		 * JLabel lblBorda = new JLabel("Borda"); lblBorda.setFont(new Font("Arial",
-		 * Font.BOLD, 15)); lblBorda.setHorizontalAlignment(SwingConstants.RIGHT);
-		 * lblBorda.setBounds(427, 182, 56, 16); contentPane.add(lblBorda);
-		 * 
-		 * JCheckBox chckbxBorda = new JCheckBox(""); chckbxBorda.setFont(new
-		 * Font("Tahoma", Font.PLAIN, 35)); chckbxBorda.setBounds(491, 179, 25, 25);
-		 * contentPane.add(chckbxBorda);
-		 */
-
-		tabelaPedido();
+		tabelaPedido(numeroPedido);
 
 		btnCancelar = new JButton("Cancelar");
 		btnCancelar.setFont(new Font("Arial", Font.PLAIN, 13));
@@ -139,26 +112,42 @@ public class Pedir extends JFrame {
 						JOptionPane.YES_NO_OPTION);
 				if (dialogButton == JOptionPane.YES_OPTION) {
 					try {
+						Connection connection = ConnectionFactory.getConnection();
+						connection.setAutoCommit(false);
+						Pedido pedido = new Pedido();
+						pedido.setFk_cliente_id_cliente(id);
+						long millis = System.currentTimeMillis();
+						Date data = new Date(millis);
+						pedido.setData_pedido(data);
+						int idPedido = 0;
+						if (numeroPedido != 0) {
+							idPedido = numeroPedido;
+							pedido.deletarPedidoProduto(connection, idPedido);
+						} else {
+							pedido.inserirPedido(connection);
+							idPedido = pedido.carregarIdPedido(connection);
+						}
+						connection.commit();
+						connection.close();
+
 						for (int i = 0; i < tablePedido.getRowCount(); i++) {
-							Connection connection = ConnectionFactory.getConnection();
-							connection.setAutoCommit(false);
-							Pedido pedido = new Pedido();
+							Connection connectionPPR = ConnectionFactory.getConnection();
+							connectionPPR.setAutoCommit(false);
+							Pedido pedidoPPR = new Pedido();
 							boolean checked = Boolean.valueOf(tablePedido.getValueAt(i, 0).toString());
 							if (checked) {
-								pedido.setFk_cliente_id_cliente(id);
-								pedido.setFk_produto_id_produto(estoque.get(i).getId_produto());
+								pedidoPPR.setFk_produto_id_produto(estoque.get(i).getId_produto());
 								int qnt = Integer.parseInt(String.valueOf(tablePedido.getValueAt(i, 3).toString()));
-								pedido.setQuantidade_produto(qnt);
+								pedidoPPR.setQuantidade_produto(qnt);
 								boolean borda = Boolean.valueOf(tablePedido.getValueAt(i, 2).toString());
-								pedido.setBorda_pizza(borda);
-								pedido.setPreco_total(somaPreco());
-								long millis = System.currentTimeMillis();
-								Date data = new Date(millis);
-								pedido.setData_pedido(data);
-								pedido.inserirPedido(connection);
+								pedidoPPR.setBorda_pizza(borda);
+								pedidoPPR.setPreco_total(somaPreco());
+								pedidoPPR.setFk_pedido_id_pedido(idPedido);
+								pedidoPPR.inserirPedidoProduto(connectionPPR);
+								System.out.println("entrei" + i);
 							}
-							connection.commit();
-							connection.close();
+							connectionPPR.commit();
+							connectionPPR.close();
 						}
 						dispose();
 						Inicial inicial = new Inicial(tel);
@@ -167,7 +156,7 @@ public class Pedir extends JFrame {
 
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null, "Ocorreu um erro: " + e.getMessage());
-						e.printStackTrace();						
+						e.printStackTrace();
 					}
 				} else {
 					remove(dialogButton);
@@ -180,7 +169,7 @@ public class Pedir extends JFrame {
 
 	}
 
-	public void tabelaPedido() {
+	public void tabelaPedido(int numeroPedido) { // monta a tabela para fazer o pedido
 
 		tablePedido = new JTable();
 		tablePedido.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -223,17 +212,47 @@ public class Pedir extends JFrame {
 		model.addColumn("Borda");
 		model.addColumn("Quantidade");
 
-		for (int i = 0; i < estoque.size(); i++) {
-			model.addRow(new Object[0]);
-			model.setValueAt(false, i, 0);
-			model.setValueAt(estoque.get(i).getNome(), i, 1);
-			model.setValueAt(false, i, 2);
-			model.setValueAt("", i, 3);
+		if (numeroPedido == 0) {
+			for (int i = 0; i < estoque.size(); i++) {
+				model.addRow(new Object[0]);
+				model.setValueAt(false, i, 0);
+				model.setValueAt(estoque.get(i).getNome(), i, 1);
+				model.setValueAt(false, i, 2);
+				model.setValueAt("", i, 3);
+			}
+		} else {
+			try {
+				Pedido editPedido = new Pedido();
+				Connection connection = ConnectionFactory.getConnection();
+				connection.setAutoCommit(false);
+				editarPedido = editPedido.editarPedido(connection, numeroPedido);
+				connection.commit();
+				connection.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			for (int i = 0; i < estoque.size(); i++) {
+				model.addRow(new Object[0]);
+				for (int j = 0; j < editarPedido.size(); j++) {
+					if (editarPedido.get(j).getFk_produto_id_produto() == estoque.get(i).getId_produto()) {
+						model.setValueAt(true, i, 0);
+						model.setValueAt(estoque.get(i).getNome(), i, 1);
+						model.setValueAt(editarPedido.get(j).isBorda_pizza(), i, 2);
+						model.setValueAt(editarPedido.get(j).getQuantidade_produto(), i, 3);
+						break;
+					} else {
+						model.setValueAt(false, i, 0);
+						model.setValueAt(estoque.get(i).getNome(), i, 1);
+						model.setValueAt(false, i, 2);
+						model.setValueAt("", i, 3);
+					}
+				}
+			}
 		}
 
 	}
 
-	public void mostraProduto() {
+	public void mostraProduto() { // mostra os produtos na tabela
 		try {
 			Connection connection = ConnectionFactory.getConnection();
 			connection.setAutoCommit(false);
@@ -248,13 +267,6 @@ public class Pedir extends JFrame {
 		}
 	}
 
-	public void carregaLista() {
-		for (Produto p : estoque) {
-			String nomeProduto = p.getNome();
-			comboBox.addItem(nomeProduto);
-		}
-	}
-
 	public double somaPreco() { // Pega o preço Total do pedido
 		double somaTotal = 0;
 		for (int j = 0; j < tablePedido.getRowCount(); j++) {
@@ -266,26 +278,32 @@ public class Pedir extends JFrame {
 		return somaTotal;
 	}
 
-	public String pedidoTotal() {
+	public String pedidoTotal() { // mostra todos os dados do pedido
 		String compraTotal = "";
 		for (int j = 0; j < tablePedido.getRowCount(); j++) {
-			Pedido pedido = new Pedido();
+			// Pedido pedido = new Pedido();
 			boolean checked = Boolean.valueOf(tablePedido.getValueAt(j, 0).toString());
 			if (checked) {
-				pedido.setFk_produto_id_produto(estoque.get(j).getId_produto());
-				int qnt = Integer.parseInt(String.valueOf(tablePedido.getValueAt(j, 3).toString()));
-				pedido.setQuantidade_produto(qnt);
+				// pedido.setFk_produto_id_produto(estoque.get(j).getId_produto());
+				// int qnt = Integer.parseInt(String.valueOf(tablePedido.getValueAt(j,
+				// 3).toString()));
+				// pedido.setQuantidade_produto(qnt);
+				String valorBorda;
 				boolean borda = Boolean.valueOf(tablePedido.getValueAt(j, 2).toString());
-				pedido.setBorda_pizza(borda);
+				if(borda) {
+					valorBorda = "Com borda";
+				}else {
+					valorBorda = "Sem borda";
+				}
+				// pedido.setBorda_pizza(borda);
 				compraTotal += "\n\nSabor: " + estoque.get(j).getNome() + "\nQuantidade: "
-						+ Integer.parseInt(String.valueOf(tablePedido.getValueAt(j, 3).toString())) + "\nBorda: "
-						+ Boolean.valueOf(tablePedido.getValueAt(j, 2).toString());
+						+ Integer.parseInt(String.valueOf(tablePedido.getValueAt(j, 3).toString())) + "\n" + valorBorda + "\n";
 			}
 		}
-		if(compraTotal == "") {
+		if (compraTotal == "") {
 			JOptionPane.showMessageDialog(null, "Pedido Vazio");
-			throw new IllegalArgumentException("Pedido Vazio"); 
+			throw new IllegalArgumentException("Pedido Vazio");
 		}
-		return compraTotal + "\n" + String.format("%.2f", somaPreco());
+		return compraTotal + "\n" + "Preço Total: " + String.format("%.2f", somaPreco());
 	}
 }
